@@ -1,0 +1,1216 @@
+---
+title: "CanineFEA_submisson"
+output: html_document
+---
+
+```{r}
+### PACKAGES ###
+require(tidyverse)
+require(ggplot2)
+require(grid)
+require(gridExtra)
+require(dplyr)
+require(reshape2)
+```
+
+
+```{r}
+### IMPORT DATA ###
+
+# RAW NODE OUTPUT FROM ABAQUS
+
+# BITING 2% tooth height
+FEA_vM_BITE_2 <- read_csv("vonMises_nodevalues_BITE_2_V2.csv")
+# BITING 50% tooth height
+FEA_vM_BITE_50 <- read_csv("vonMises_nodevalues_BITE_50_V2.csv")
+# BITING with 70 nodes
+FEA_vM_BITE_70 <- read_csv("vonMises_nodevalues_BITE_70nodes.csv")
+
+# OFF-ANGLE BITING -30 in anterior-posterior (also called 60 degrees)
+FEA_vM_BITE_2_60 <- read_csv("vonMises_nodevalues_BITE_2_60_2.csv")
+# OFF-ANGLE BITING +30 in anterior-posterior or (also called 120 degrees)
+FEA_vM_BITE_2_120 <- read_csv("vonMises_nodevalues_BITE_2_120.csv")
+
+# OFF-ANGLE BITING -30 in lingual-labial (also called 60 degrees)
+FEA_vM_BITE_2_60_LL <- read_csv("vonMises_nodevalues_BITE_2_60_LL.csv")
+# OFF-ANGLE BITING -30 in lingual-labial (also called 120 degrees)
+FEA_vM_BITE_2_120_LL <- read_csv("vonMises_nodevalues_BITE_2_120_LL.csv")
+
+# PULLING 50% tooth height
+FEA_vM_PULL_50 <- read_csv("vonMises_nodevalues_PULL_50_V2.csv")
+# PULLING 90% tooth height
+FEA_vM_PULL_90 <- read_csv("vonMises_nodevalues_PULL_90.csv")
+# SHAKING 50% tooth height
+FEA_vM_SHAKE_50 <- read_csv("vonMises_nodevalues_SHAKE_50_V3.csv")
+# SHAKING 90% tooth height
+FEA_vM_SHAKE_90 <- read_csv("vonMises_nodevalues_SHAKE_90.csv")
+
+# CALCULATED STRESS PERCENTILES (alldata, 99, 95, and 90) COLLATED FOR FEA and MAX STRESS VALUES FOR BTA
+ALL <- read_csv("BITE_PULL_SHAKE_all_percentiles.csv")
+
+# ALL BT AND FEA STRESSES
+BT_FEA_STRESSES <- read_csv("Max.stress.vs.vonMises.csv")
+
+
+
+```
+
+
+```{r}
+### CALCULATING PERCENTILES (FEA) ----> BITE 2%
+FEA_vM_BITE_2
+
+#### A. melanoleuca
+max(FEA_vM_BITE_2$A.melanoleuca, na.rm = T)
+quantile(FEA_vM_BITE_2$A.melanoleuca, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_2$A.melanoleuca, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_2$A.melanoleuca, 0.90, na.rm = T)
+#### C. dingo
+max(FEA_vM_BITE_2$C.dingo, na.rm = T)
+quantile(FEA_vM_BITE_2$C.dingo, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_2$C.dingo, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_2$C.dingo, 0.90, na.rm = T)
+#### D. marsupialis
+max(FEA_vM_BITE_2$D.marsupialis, na.rm = T)
+quantile(FEA_vM_BITE_2$D.marsupialis, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_2$D.marsupialis, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_2$D.marsupialis, 0.90, na.rm = T)
+#### E. barbara
+max(FEA_vM_BITE_2$E.barbara, na.rm = T)
+quantile(FEA_vM_BITE_2$E.barbara, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_2$E.barbara, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_2$E.barbara, 0.90, na.rm = T)
+#### L. pardalis
+max(FEA_vM_BITE_2$L.pardalis, na.rm = T)
+quantile(FEA_vM_BITE_2$L.pardalis, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_2$L.pardalis, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_2$L.pardalis, 0.90, na.rm = T)
+#### P. lotor
+max(FEA_vM_BITE_2$P.lotor, na.rm = T)
+quantile(FEA_vM_BITE_2$P.lotor, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_2$P.lotor, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_2$P.lotor, 0.90, na.rm = T)
+#### P. uncia
+max(FEA_vM_BITE_2$P.uncia, na.rm = T)
+quantile(FEA_vM_BITE_2$P.uncia, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_2$P.uncia, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_2$P.uncia, 0.90, na.rm = T)
+#### S. harrisii
+max(FEA_vM_BITE_2$S.harrisii, na.rm = T)
+quantile(FEA_vM_BITE_2$S.harrisii, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_2$S.harrisii, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_2$S.harrisii, 0.90, na.rm = T)
+#### U. arctos
+max(FEA_vM_BITE_2$U.arctos, na.rm = T)
+quantile(FEA_vM_BITE_2$U.arctos, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_2$U.arctos, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_2$U.arctos, 0.90, na.rm = T)
+#### V. vulpes
+max(FEA_vM_BITE_2$V.vulpes, na.rm = T)
+quantile(FEA_vM_BITE_2$V.vulpes, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_2$V.vulpes, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_2$V.vulpes, 0.90, na.rm = T)
+#### V. zibetha
+max(FEA_vM_BITE_2$V.zibetha, na.rm = T)
+quantile(FEA_vM_BITE_2$V.zibetha, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_2$V.zibetha, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_2$V.zibetha, 0.90, na.rm = T)
+#### PC1 MAX
+max(FEA_vM_BITE_2$PC1.max, na.rm = T)
+quantile(FEA_vM_BITE_2$PC1.max, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_2$PC1.max, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_2$PC1.max, 0.90, na.rm = T)
+#### PC1 MIN
+max(FEA_vM_BITE_2$PC1.min, na.rm = T)
+quantile(FEA_vM_BITE_2$PC1.min, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_2$PC1.min, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_2$PC1.min, 0.90, na.rm = T)
+#### PC2 MAX
+max(FEA_vM_BITE_2$PC2.max, na.rm = T)
+quantile(FEA_vM_BITE_2$PC2.max, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_2$PC2.max, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_2$PC2.max, 0.90, na.rm = T)
+#### PC2 MIN
+max(FEA_vM_BITE_2$PC2.min, na.rm = T)
+quantile(FEA_vM_BITE_2$PC2.min, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_2$PC2.min, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_2$PC2.min, 0.90, na.rm = T)
+#### MEAN SHAPE
+max(FEA_vM_BITE_2$MeanShape, na.rm = T)
+quantile(FEA_vM_BITE_2$MeanShape, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_2$MeanShape, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_2$MeanShape, 0.90, na.rm = T)
+#### PC1 POS PC2 POS
+max(FEA_vM_BITE_2$PC1pos.PC2pos, na.rm = T)
+quantile(FEA_vM_BITE_2$PC1pos.PC2pos, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_2$PC1pos.PC2pos, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_2$PC1pos.PC2pos, 0.90, na.rm = T)
+#### PC1 POS PC2 NEG
+max(FEA_vM_BITE_2$PC1pos.PC2neg, na.rm = T)
+quantile(FEA_vM_BITE_2$PC1pos.PC2neg, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_2$PC1pos.PC2neg, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_2$PC1pos.PC2neg, 0.90, na.rm = T)
+#### PC1 NEG PC2 POS
+max(FEA_vM_BITE_2$PC1neg.PC2pos, na.rm = T)
+quantile(FEA_vM_BITE_2$PC1neg.PC2pos, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_2$PC1neg.PC2pos, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_2$PC1neg.PC2pos, 0.90, na.rm = T)
+#### PC1 NEG PC2 NEG
+max(FEA_vM_BITE_2$PC1neg.PC2neg, na.rm = T)
+quantile(FEA_vM_BITE_2$PC1neg.PC2neg, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_2$PC1neg.PC2neg, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_2$PC1neg.PC2neg, 0.90, na.rm = T)
+
+```
+
+```{r}
+#### CALCULATING PERCENTILES (FEA) ----> BITE 50%
+FEA_vM_BITE_50
+
+#### A. melanoleuca
+max(FEA_vM_BITE_50$A.melanoleuca, na.rm = T)
+quantile(FEA_vM_BITE_50$A.melanoleuca, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_50$A.melanoleuca, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_50$A.melanoleuca, 0.90, na.rm = T)
+#### C. dingo
+max(FEA_vM_BITE_50$C.dingo, na.rm = T)
+quantile(FEA_vM_BITE_50$C.dingo, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_50$C.dingo, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_50$C.dingo, 0.90, na.rm = T)
+#### D. marsupialis
+max(FEA_vM_BITE_50$D.marsupialis, na.rm = T)
+quantile(FEA_vM_BITE_50$D.marsupialis, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_50$D.marsupialis, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_50$D.marsupialis, 0.90, na.rm = T)
+#### E. barbara
+max(FEA_vM_BITE_50$E.barbara, na.rm = T)
+quantile(FEA_vM_BITE_50$E.barbara, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_50$E.barbara, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_50$E.barbara, 0.90, na.rm = T)
+#### L. pardalis
+max(FEA_vM_BITE_50$L.pardalis, na.rm = T)
+quantile(FEA_vM_BITE_50$L.pardalis, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_50$L.pardalis, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_50$L.pardalis, 0.90, na.rm = T)
+#### P. lotor
+max(FEA_vM_BITE_50$P.lotor,na.rm = T)
+quantile(FEA_vM_BITE_50$P.lotor, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_50$P.lotor, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_50$P.lotor, 0.90, na.rm = T)
+#### P. uncia
+max(FEA_vM_BITE_50$P.uncia, na.rm = T)
+quantile(FEA_vM_BITE_50$P.uncia, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_50$P.uncia, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_50$P.uncia, 0.90, na.rm = T)
+#### S. harrisii
+max(FEA_vM_BITE_50$S.harrisii, na.rm = T)
+quantile(FEA_vM_BITE_50$S.harrisii, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_50$S.harrisii, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_50$S.harrisii, 0.90, na.rm = T)
+#### U. arctos
+max(FEA_vM_BITE_50$U.arctos, na.rm = T)
+quantile(FEA_vM_BITE_50$U.arctos, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_50$U.arctos, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_50$U.arctos, 0.90, na.rm = T)
+#### V. vulpes
+max(FEA_vM_BITE_50$V.vulpes, na.rm = T)
+quantile(FEA_vM_BITE_50$V.vulpes, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_50$V.vulpes, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_50$V.vulpes, 0.90, na.rm = T)
+#### V. zibetha
+max(FEA_vM_BITE_50$V.zibetha, na.rm = T)
+quantile(FEA_vM_BITE_50$V.zibetha, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_50$V.zibetha, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_50$V.zibetha, 0.90, na.rm = T)
+#### PC1 MAX
+max(FEA_vM_BITE_50$PC1.max, na.rm = T)
+quantile(FEA_vM_BITE_50$PC1.max, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_50$PC1.max, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_50$PC1.max, 0.90, na.rm = T)
+#### PC1 MIN
+max(FEA_vM_BITE_50$PC1.min, na.rm = T)
+quantile(FEA_vM_BITE_50$PC1.min, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_50$PC1.min, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_50$PC1.min, 0.90, na.rm = T)
+#### PC2 MAX
+max(FEA_vM_BITE_50$PC2.max, na.rm = T)
+quantile(FEA_vM_BITE_50$PC2.max, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_50$PC2.max, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_50$PC2.max, 0.90, na.rm = T)
+#### PC2 MIN
+max(FEA_vM_BITE_50$PC2.min,na.rm = T)
+quantile(FEA_vM_BITE_50$PC2.min, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_50$PC2.min, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_50$PC2.min, 0.90, na.rm = T)
+#### MEAN SHAPE
+max(FEA_vM_BITE_50$MeanShape, na.rm = T)
+quantile(FEA_vM_BITE_50$MeanShape, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_50$MeanShape, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_50$MeanShape, 0.90, na.rm = T)
+#### PC1 POS PC2 POS
+max(FEA_vM_BITE_50$PC1pos.PC2pos, na.rm = T)
+quantile(FEA_vM_BITE_50$PC1pos.PC2pos, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_50$PC1pos.PC2pos, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_50$PC1pos.PC2pos, 0.90, na.rm = T)
+#### PC1 POS PC2 NEG
+max(FEA_vM_BITE_50$PC1pos.PC2neg, na.rm = T)
+quantile(FEA_vM_BITE_50$PC1pos.PC2neg, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_50$PC1pos.PC2neg, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_50$PC1pos.PC2neg, 0.90, na.rm = T)
+#### PC1 NEG PC2 POS
+max(FEA_vM_BITE_50$PC1neg.PC2pos, na.rm = T)
+quantile(FEA_vM_BITE_50$PC1neg.PC2pos, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_50$PC1neg.PC2pos, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_50$PC1neg.PC2pos, 0.90, na.rm = T)
+#### PC1 NEG PC2 NEG
+max(FEA_vM_BITE_50$PC1neg.PC2neg, na.rm = T)
+quantile(FEA_vM_BITE_50$PC1neg.PC2neg, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_50$PC1neg.PC2neg, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_50$PC1neg.PC2neg, 0.90, na.rm = T)
+```
+
+```{r}
+#### CALCULATING PERCENTILES (FEA) ----> BITE 70 nodes
+FEA_vM_BITE_70
+
+#### A. melanoleuca
+max(FEA_vM_BITE_70$A.melanoleuca, na.rm = T)
+quantile(FEA_vM_BITE_70$A.melanoleuca, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_70$A.melanoleuca, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_70$A.melanoleuca, 0.90, na.rm = T)
+#### C. dingo
+max(FEA_vM_BITE_70$C.dingo, na.rm = T)
+quantile(FEA_vM_BITE_70$C.dingo, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_70$C.dingo, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_70$C.dingo, 0.90, na.rm = T)
+#### D. marsupialis
+max(FEA_vM_BITE_70$D.marsupialis, na.rm = T)
+quantile(FEA_vM_BITE_70$D.marsupialis, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_70$D.marsupialis, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_70$D.marsupialis, 0.90, na.rm = T)
+#### E. barbara
+max(FEA_vM_BITE_70$E.barbara, na.rm = T)
+quantile(FEA_vM_BITE_70$E.barbara, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_70$E.barbara, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_70$E.barbara, 0.90, na.rm = T)
+#### L. pardalis
+max(FEA_vM_BITE_70$L.pardalis, na.rm = T)
+quantile(FEA_vM_BITE_70$L.pardalis, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_70$L.pardalis, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_70$L.pardalis, 0.90, na.rm = T)
+#### P. lotor
+max(FEA_vM_BITE_70$P.lotor,na.rm = T)
+quantile(FEA_vM_BITE_70$P.lotor, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_70$P.lotor, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_70$P.lotor, 0.90, na.rm = T)
+#### P. uncia
+max(FEA_vM_BITE_70$P.uncia, na.rm = T)
+quantile(FEA_vM_BITE_70$P.uncia, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_70$P.uncia, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_70$P.uncia, 0.90, na.rm = T)
+#### S. harrisii
+max(FEA_vM_BITE_70$S.harrisii, na.rm = T)
+quantile(FEA_vM_BITE_70$S.harrisii, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_70$S.harrisii, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_70$S.harrisii, 0.90, na.rm = T)
+#### U. arctos
+max(FEA_vM_BITE_70$U.arctos, na.rm = T)
+quantile(FEA_vM_BITE_70$U.arctos, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_70$U.arctos, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_70$U.arctos, 0.90, na.rm = T)
+#### V. vulpes
+max(FEA_vM_BITE_70$V.vulpes, na.rm = T)
+quantile(FEA_vM_BITE_70$V.vulpes, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_70$V.vulpes, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_70$V.vulpes, 0.90, na.rm = T)
+#### V. zibetha
+max(FEA_vM_BITE_70$V.zibetha, na.rm = T)
+quantile(FEA_vM_BITE_70$V.zibetha, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_70$V.zibetha, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_70$V.zibetha, 0.90, na.rm = T)
+#### PC1 MAX
+max(FEA_vM_BITE_70$PC1.max, na.rm = T)
+quantile(FEA_vM_BITE_70$PC1.max, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_70$PC1.max, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_70$PC1.max, 0.90, na.rm = T)
+#### PC1 MIN
+max(FEA_vM_BITE_70$PC1.min, na.rm = T)
+quantile(FEA_vM_BITE_70$PC1.min, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_70$PC1.min, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_70$PC1.min, 0.90, na.rm = T)
+#### PC2 MAX
+max(FEA_vM_BITE_70$PC2.max, na.rm = T)
+quantile(FEA_vM_BITE_70$PC2.max, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_70$PC2.max, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_70$PC2.max, 0.90, na.rm = T)
+#### PC2 MIN
+max(FEA_vM_BITE_70$PC2.min,na.rm = T)
+quantile(FEA_vM_BITE_70$PC2.min, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_70$PC2.min, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_70$PC2.min, 0.90, na.rm = T)
+#### MEAN SHAPE
+max(FEA_vM_BITE_70$MeanShape, na.rm = T)
+quantile(FEA_vM_BITE_70$MeanShape, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_70$MeanShape, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_70$MeanShape, 0.90, na.rm = T)
+#### PC1 POS PC2 POS
+max(FEA_vM_BITE_50$PC1pos.PC2pos, na.rm = T)
+quantile(FEA_vM_BITE_50$PC1pos.PC2pos, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_50$PC1pos.PC2pos, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_50$PC1pos.PC2pos, 0.90, na.rm = T)
+#### PC1 POS PC2 NEG
+max(FEA_vM_BITE_50$PC1pos.PC2neg, na.rm = T)
+quantile(FEA_vM_BITE_50$PC1pos.PC2neg, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_50$PC1pos.PC2neg, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_50$PC1pos.PC2neg, 0.90, na.rm = T)
+#### PC1 NEG PC2 POS
+max(FEA_vM_BITE_50$PC1neg.PC2pos, na.rm = T)
+quantile(FEA_vM_BITE_50$PC1neg.PC2pos, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_50$PC1neg.PC2pos, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_50$PC1neg.PC2pos, 0.90, na.rm = T)
+#### PC1 NEG PC2 NEG
+max(FEA_vM_BITE_50$PC1neg.PC2neg, na.rm = T)
+quantile(FEA_vM_BITE_50$PC1neg.PC2neg, 0.99, na.rm = T)
+quantile(FEA_vM_BITE_50$PC1neg.PC2neg, 0.95, na.rm = T)
+quantile(FEA_vM_BITE_50$PC1neg.PC2neg, 0.90, na.rm = T)
+```
+
+
+
+
+```{r}
+#### CALCULATING PERCENTILES (FEA) ----> PULL 50%
+FEA_vM_PULL_50
+
+#### A. melanoleuca
+max(FEA_vM_PULL_50$A.melanoleuca, na.rm = T)
+quantile(FEA_vM_PULL_50$A.melanoleuca, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_50$A.melanoleuca, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_50$A.melanoleuca, 0.90, na.rm = T)
+#### C. dingo
+max(FEA_vM_PULL_50$C.dingo, na.rm = T)
+quantile(FEA_vM_PULL_50$C.dingo, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_50$C.dingo, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_50$C.dingo, 0.90, na.rm = T)
+#### D. marsupialis
+max(FEA_vM_PULL_50$D.marsupialis, na.rm = T)
+quantile(FEA_vM_PULL_50$D.marsupialis, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_50$D.marsupialis, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_50$D.marsupialis, 0.90, na.rm = T)
+#### E. barbara
+max(FEA_vM_PULL_50$E.barbara, na.rm = T)
+quantile(FEA_vM_PULL_50$E.barbara, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_50$E.barbara, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_50$E.barbara, 0.90, na.rm = T)
+#### L. pardalis
+max(FEA_vM_PULL_50$L.pardalis, na.rm = T)
+quantile(FEA_vM_PULL_50$L.pardalis, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_50$L.pardalis, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_50$L.pardalis, 0.90, na.rm = T)
+#### P. lotor
+max(FEA_vM_PULL_50$P.lotor,na.rm = T)
+quantile(FEA_vM_PULL_50$P.lotor, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_50$P.lotor, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_50$P.lotor, 0.90, na.rm = T)
+#### P. uncia
+max(FEA_vM_PULL_50$P.uncia, na.rm = T)
+quantile(FEA_vM_PULL_50$P.uncia, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_50$P.uncia, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_50$P.uncia, 0.90, na.rm = T)
+#### S. harrisii
+max(FEA_vM_PULL_50$S.harrisii, na.rm = T)
+quantile(FEA_vM_PULL_50$S.harrisii, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_50$S.harrisii, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_50$S.harrisii, 0.90, na.rm = T)
+#### U. arctos
+max(FEA_vM_PULL_50$U.arctos, na.rm = T)
+quantile(FEA_vM_PULL_50$U.arctos, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_50$U.arctos, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_50$U.arctos, 0.90, na.rm = T)
+#### V. vulpes
+max(FEA_vM_PULL_50$V.vulpes, na.rm = T)
+quantile(FEA_vM_PULL_50$V.vulpes, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_50$V.vulpes, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_50$V.vulpes, 0.90, na.rm = T)
+#### V. zibetha
+max(FEA_vM_PULL_50$V.zibetha, na.rm = T)
+quantile(FEA_vM_PULL_50$V.zibetha, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_50$V.zibetha, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_50$V.zibetha, 0.90, na.rm = T)
+#### PC1 MAX
+max(FEA_vM_PULL_50$PC1.max, na.rm = T)
+quantile(FEA_vM_PULL_50$PC1.max, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_50$PC1.max, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_50$PC1.max, 0.90, na.rm = T)
+#### PC1 MIN
+max(FEA_vM_PULL_50$PC1.min, na.rm = T)
+quantile(FEA_vM_PULL_50$PC1.min, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_50$PC1.min, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_50$PC1.min, 0.90, na.rm = T)
+#### PC2 MAX
+max(FEA_vM_PULL_50$PC2.max, na.rm = T)
+quantile(FEA_vM_PULL_50$PC2.max, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_50$PC2.max, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_50$PC2.max, 0.90, na.rm = T)
+#### PC2 MIN
+max(FEA_vM_PULL_50$PC2.min,na.rm = T)
+quantile(FEA_vM_PULL_50$PC2.min, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_50$PC2.min, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_50$PC2.min, 0.90, na.rm = T)
+#### MEAN SHAPE
+max(FEA_vM_PULL_50$MeanShape, na.rm = T)
+quantile(FEA_vM_PULL_50$MeanShape, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_50$MeanShape, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_50$MeanShape, 0.90, na.rm = T)
+#### PC1 POS PC2 POS
+max(FEA_vM_PULL_50$PC1pos.PC2pos, na.rm = T)
+quantile(FEA_vM_PULL_50$PC1pos.PC2pos, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_50$PC1pos.PC2pos, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_50$PC1pos.PC2pos, 0.90, na.rm = T)
+#### PC1 POS PC2 NEG
+max(FEA_vM_PULL_50$PC1pos.PC2neg, na.rm = T)
+quantile(FEA_vM_PULL_50$PC1pos.PC2neg, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_50$PC1pos.PC2neg, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_50$PC1pos.PC2neg, 0.90, na.rm = T)
+#### PC1 NEG PC2 POS
+max(FEA_vM_PULL_50$PC1neg.PC2pos, na.rm = T)
+quantile(FEA_vM_PULL_50$PC1neg.PC2pos, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_50$PC1neg.PC2pos, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_50$PC1neg.PC2pos, 0.90, na.rm = T)
+#### PC1 NEG PC2 NEG
+max(FEA_vM_PULL_50$PC1neg.PC2neg, na.rm = T)
+quantile(FEA_vM_PULL_50$PC1neg.PC2neg, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_50$PC1neg.PC2neg, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_50$PC1neg.PC2neg, 0.90, na.rm = T)
+
+```
+
+
+```{r}
+#### CALCULATING PERCENTILES (FEA) ----> PULL 90%
+FEA_vM_PULL_90
+
+#### A. melanoleuca
+max(FEA_vM_PULL_90$A.melanoleuca, na.rm = T)
+quantile(FEA_vM_PULL_90$A.melanoleuca, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_90$A.melanoleuca, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_90$A.melanoleuca, 0.90, na.rm = T)
+#### C. dingo
+max(FEA_vM_PULL_90$C.dingo, na.rm = T)
+quantile(FEA_vM_PULL_90$C.dingo, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_90$C.dingo, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_90$C.dingo, 0.90, na.rm = T)
+#### D. marsupialis
+max(FEA_vM_PULL_90$D.marsupialis, na.rm = T)
+quantile(FEA_vM_PULL_90$D.marsupialis, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_90$D.marsupialis, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_90$D.marsupialis, 0.90, na.rm = T)
+#### E. barbara
+max(FEA_vM_PULL_90$E.barbara, na.rm = T)
+quantile(FEA_vM_PULL_90$E.barbara, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_90$E.barbara, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_90$E.barbara, 0.90, na.rm = T)
+#### L. pardalis
+max(FEA_vM_PULL_90$L.pardalis, na.rm = T)
+quantile(FEA_vM_PULL_90$L.pardalis, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_90$L.pardalis, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_90$L.pardalis, 0.90, na.rm = T)
+#### P. lotor
+max(FEA_vM_PULL_90$P.lotor,na.rm = T)
+quantile(FEA_vM_PULL_90$P.lotor, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_90$P.lotor, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_90$P.lotor, 0.90, na.rm = T)
+#### P. uncia
+max(FEA_vM_PULL_90$P.uncia, na.rm = T)
+quantile(FEA_vM_PULL_90$P.uncia, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_90$P.uncia, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_90$P.uncia, 0.90, na.rm = T)
+#### S. harrisii
+max(FEA_vM_PULL_90$S.harrisii, na.rm = T)
+quantile(FEA_vM_PULL_90$S.harrisii, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_90$S.harrisii, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_90$S.harrisii, 0.90, na.rm = T)
+#### U. arctos
+max(FEA_vM_PULL_90$U.arctos, na.rm = T)
+quantile(FEA_vM_PULL_90$U.arctos, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_90$U.arctos, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_90$U.arctos, 0.90, na.rm = T)
+#### V. vulpes
+max(FEA_vM_PULL_90$V.vulpes, na.rm = T)
+quantile(FEA_vM_PULL_90$V.vulpes, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_90$V.vulpes, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_90$V.vulpes, 0.90, na.rm = T)
+#### V. zibetha
+max(FEA_vM_PULL_90$V.zibetha, na.rm = T)
+quantile(FEA_vM_PULL_90$V.zibetha, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_90$V.zibetha, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_90$V.zibetha, 0.90, na.rm = T)
+#### PC1 MAX
+max(FEA_vM_PULL_90$PC1.max, na.rm = T)
+quantile(FEA_vM_PULL_90$PC1.max, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_90$PC1.max, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_90$PC1.max, 0.90, na.rm = T)
+#### PC1 MIN
+max(FEA_vM_PULL_90$PC1.min, na.rm = T)
+quantile(FEA_vM_PULL_90$PC1.min, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_90$PC1.min, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_90$PC1.min, 0.90, na.rm = T)
+#### PC2 MAX
+max(FEA_vM_PULL_90$PC2.max, na.rm = T)
+quantile(FEA_vM_PULL_90$PC2.max, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_90$PC2.max, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_90$PC2.max, 0.90, na.rm = T)
+#### PC2 MIN
+max(FEA_vM_PULL_90$PC2.min,na.rm = T)
+quantile(FEA_vM_PULL_90$PC2.min, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_90$PC2.min, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_90$PC2.min, 0.90, na.rm = T)
+#### MEAN SHAPE
+max(FEA_vM_PULL_90$MeanShape, na.rm = T)
+quantile(FEA_vM_PULL_90$MeanShape, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_90$MeanShape, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_90$MeanShape, 0.90, na.rm = T)
+#### PC1 POS PC2 POS
+max(FEA_vM_PULL_90$PC1pos.PC2pos, na.rm = T)
+quantile(FEA_vM_PULL_90$PC1pos.PC2pos, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_90$PC1pos.PC2pos, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_90$PC1pos.PC2pos, 0.90, na.rm = T)
+#### PC1 POS PC2 NEG
+max(FEA_vM_PULL_90$PC1pos.PC2neg, na.rm = T)
+quantile(FEA_vM_PULL_90$PC1pos.PC2neg, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_90$PC1pos.PC2neg, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_90$PC1pos.PC2neg, 0.90, na.rm = T)
+#### PC1 NEG PC2 POS
+max(FEA_vM_PULL_90$PC1neg.PC2pos, na.rm = T)
+quantile(FEA_vM_PULL_90$PC1neg.PC2pos, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_90$PC1neg.PC2pos, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_90$PC1neg.PC2pos, 0.90, na.rm = T)
+#### PC1 NEG PC2 NEG
+max(FEA_vM_PULL_90$PC1neg.PC2neg, na.rm = T)
+quantile(FEA_vM_PULL_90$PC1neg.PC2neg, 0.99, na.rm = T)
+quantile(FEA_vM_PULL_90$PC1neg.PC2neg, 0.95, na.rm = T)
+quantile(FEA_vM_PULL_90$PC1neg.PC2neg, 0.90, na.rm = T)
+```
+
+
+```{r}
+#### CALCULATING PERCENTILES (FEA) ----> SHAKE 50%
+FEA_vM_SHAKE_50
+
+#### A. melanoleuca
+max(FEA_vM_SHAKE_50$A.melanoleuca, na.rm = T)
+quantile(FEA_vM_SHAKE_50$A.melanoleuca, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_50$A.melanoleuca, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_50$A.melanoleuca, 0.90, na.rm = T)
+#### C. dingo
+max(FEA_vM_SHAKE_50$C.dingo, na.rm = T)
+quantile(FEA_vM_SHAKE_50$C.dingo, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_50$C.dingo, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_50$C.dingo, 0.90, na.rm = T)
+#### D. marsupialis
+max(FEA_vM_SHAKE_50$D.marsupialis, na.rm = T)
+quantile(FEA_vM_SHAKE_50$D.marsupialis, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_50$D.marsupialis, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_50$D.marsupialis, 0.90, na.rm = T)
+#### E. barbara
+max(FEA_vM_SHAKE_50$E.barbara, na.rm = T)
+quantile(FEA_vM_SHAKE_50$E.barbara, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_50$E.barbara, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_50$E.barbara, 0.90, na.rm = T)
+#### L. pardalis
+max(FEA_vM_SHAKE_50$L.pardalis, na.rm = T)
+quantile(FEA_vM_SHAKE_50$L.pardalis, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_50$L.pardalis, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_50$L.pardalis, 0.90, na.rm = T)
+#### P. lotor
+max(FEA_vM_SHAKE_50$P.lotor,na.rm = T)
+quantile(FEA_vM_SHAKE_50$P.lotor, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_50$P.lotor, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_50$P.lotor, 0.90, na.rm = T)
+#### P. uncia
+max(FEA_vM_SHAKE_50$P.uncia, na.rm = T)
+quantile(FEA_vM_SHAKE_50$P.uncia, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_50$P.uncia, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_50$P.uncia, 0.90, na.rm = T)
+#### S. harrisii
+max(FEA_vM_SHAKE_50$S.harrisii, na.rm = T)
+quantile(FEA_vM_SHAKE_50$S.harrisii, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_50$S.harrisii, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_50$S.harrisii, 0.90, na.rm = T)
+#### U. arctos
+max(FEA_vM_SHAKE_50$U.arctos, na.rm = T)
+quantile(FEA_vM_SHAKE_50$U.arctos, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_50$U.arctos, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_50$U.arctos, 0.90, na.rm = T)
+#### V. vulpes
+max(FEA_vM_SHAKE_50$V.vulpes, na.rm = T)
+quantile(FEA_vM_SHAKE_50$V.vulpes, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_50$V.vulpes, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_50$V.vulpes, 0.90, na.rm = T)
+#### V. zibetha
+max(FEA_vM_SHAKE_50$V.zibetha, na.rm = T)
+quantile(FEA_vM_SHAKE_50$V.zibetha, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_50$V.zibetha, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_50$V.zibetha, 0.90, na.rm = T)
+#### PC1 MAX
+max(FEA_vM_SHAKE_50$PC1.max, na.rm = T)
+quantile(FEA_vM_SHAKE_50$PC1.max, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_50$PC1.max, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_50$PC1.max, 0.90, na.rm = T)
+#### PC1 MIN
+max(FEA_vM_SHAKE_50$PC1.min, na.rm = T)
+quantile(FEA_vM_SHAKE_50$PC1.min, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_50$PC1.min, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_50$PC1.min, 0.90, na.rm = T)
+#### PC2 MAX
+max(FEA_vM_SHAKE_50$PC2.max, na.rm = T)
+quantile(FEA_vM_SHAKE_50$PC2.max, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_50$PC2.max, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_50$PC2.max, 0.90, na.rm = T)
+#### PC2 MIN
+max(FEA_vM_SHAKE_50$PC2.min,na.rm = T)
+quantile(FEA_vM_SHAKE_50$PC2.min, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_50$PC2.min, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_50$PC2.min, 0.90, na.rm = T)
+#### MEAN SHAPE
+max(FEA_vM_SHAKE_50$MeanShape, na.rm = T)
+quantile(FEA_vM_SHAKE_50$MeanShape, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_50$MeanShape, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_50$MeanShape, 0.90, na.rm = T)
+#### PC1 POS PC2 POS
+max(FEA_vM_SHAKE_50$PC1pos.PC2pos, na.rm = T)
+quantile(FEA_vM_SHAKE_50$PC1pos.PC2pos, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_50$PC1pos.PC2pos, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_50$PC1pos.PC2pos, 0.90, na.rm = T)
+#### PC1 POS PC2 NEG
+max(FEA_vM_SHAKE_50$PC1pos.PC2neg, na.rm = T)
+quantile(FEA_vM_SHAKE_50$PC1pos.PC2neg, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_50$PC1pos.PC2neg, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_50$PC1pos.PC2neg, 0.90, na.rm = T)
+#### PC1 NEG PC2 POS
+max(FEA_vM_SHAKE_50$PC1neg.PC2pos, na.rm = T)
+quantile(FEA_vM_SHAKE_50$PC1neg.PC2pos, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_50$PC1neg.PC2pos, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_50$PC1neg.PC2pos, 0.90, na.rm = T)
+#### PC1 NEG PC2 NEG
+max(FEA_vM_SHAKE_50$PC1neg.PC2neg, na.rm = T)
+quantile(FEA_vM_SHAKE_50$PC1neg.PC2neg, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_50$PC1neg.PC2neg, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_50$PC1neg.PC2neg, 0.90, na.rm = T)
+```
+
+```{r}
+#### CALCULATING PERCENTILES (FEA) ----> SHAKE 90%
+FEA_vM_SHAKE_90
+#### A. melanoleuca
+max(FEA_vM_SHAKE_90$A.melanoleuca, na.rm = T)
+quantile(FEA_vM_SHAKE_90$A.melanoleuca, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_90$A.melanoleuca, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_90$A.melanoleuca, 0.90, na.rm = T)
+#### C. dingo
+max(FEA_vM_SHAKE_90$C.dingo, na.rm = T)
+quantile(FEA_vM_SHAKE_90$C.dingo, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_90$C.dingo, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_90$C.dingo, 0.90, na.rm = T)
+#### D. marsupialis
+max(FEA_vM_SHAKE_90$D.marsupialis, na.rm = T)
+quantile(FEA_vM_SHAKE_90$D.marsupialis, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_90$D.marsupialis, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_90$D.marsupialis, 0.90, na.rm = T)
+#### E. barbara
+max(FEA_vM_SHAKE_90$E.barbara, na.rm = T)
+quantile(FEA_vM_SHAKE_90$E.barbara, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_90$E.barbara, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_90$E.barbara, 0.90, na.rm = T)
+#### L. pardalis
+max(FEA_vM_SHAKE_90$L.pardalis, na.rm = T)
+quantile(FEA_vM_SHAKE_90$L.pardalis, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_90$L.pardalis, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_90$L.pardalis, 0.90, na.rm = T)
+#### P. lotor
+max(FEA_vM_SHAKE_90$P.lotor,na.rm = T)
+quantile(FEA_vM_SHAKE_90$P.lotor, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_90$P.lotor, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_90$P.lotor, 0.90, na.rm = T)
+#### P. uncia
+max(FEA_vM_SHAKE_90$P.unica, na.rm = T)
+quantile(FEA_vM_SHAKE_90$P.unica, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_90$P.unica, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_90$P.unica, 0.90, na.rm = T)
+#### S. harrisii
+max(FEA_vM_SHAKE_90$S.harrisii, na.rm = T)
+quantile(FEA_vM_SHAKE_90$S.harrisii, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_90$S.harrisii, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_90$S.harrisii, 0.90, na.rm = T)
+#### U. arctos
+max(FEA_vM_SHAKE_90$U.arctos, na.rm = T)
+quantile(FEA_vM_SHAKE_90$U.arctos, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_90$U.arctos, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_90$U.arctos, 0.90, na.rm = T)
+#### V. vulpes
+max(FEA_vM_SHAKE_90$V.vulpes, na.rm = T)
+quantile(FEA_vM_SHAKE_90$V.vulpes, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_90$V.vulpes, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_90$V.vulpes, 0.90, na.rm = T)
+#### V. zibetha
+max(FEA_vM_SHAKE_90$V.zibetha, na.rm = T)
+quantile(FEA_vM_SHAKE_90$V.zibetha, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_90$V.zibetha, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_90$V.zibetha, 0.90, na.rm = T)
+#### PC1 MAX
+max(FEA_vM_SHAKE_90$PC1.max, na.rm = T)
+quantile(FEA_vM_SHAKE_90$PC1.max, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_90$PC1.max, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_90$PC1.max, 0.90, na.rm = T)
+#### PC1 MIN
+max(FEA_vM_SHAKE_90$PC1.min, na.rm = T)
+quantile(FEA_vM_SHAKE_90$PC1.min, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_90$PC1.min, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_90$PC1.min, 0.90, na.rm = T)
+#### PC2 MAX
+max(FEA_vM_SHAKE_90$PC2.max, na.rm = T)
+quantile(FEA_vM_SHAKE_90$PC2.max, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_90$PC2.max, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_90$PC2.max, 0.90, na.rm = T)
+#### PC2 MIN
+max(FEA_vM_SHAKE_90$PC2.min,na.rm = T)
+quantile(FEA_vM_SHAKE_90$PC2.min, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_90$PC2.min, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_90$PC2.min, 0.90, na.rm = T)
+#### MEAN SHAPE
+max(FEA_vM_SHAKE_90$MeanShape, na.rm = T)
+quantile(FEA_vM_SHAKE_90$MeanShape, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_90$MeanShape, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_90$MeanShape, 0.90, na.rm = T)
+#### PC1 POS PC2 POS
+max(FEA_vM_SHAKE_90$PC1pos.PC2pos, na.rm = T)
+quantile(FEA_vM_SHAKE_90$PC1pos.PC2pos, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_90$PC1pos.PC2pos, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_90$PC1pos.PC2pos, 0.90, na.rm = T)
+#### PC1 POS PC2 NEG
+max(FEA_vM_SHAKE_90$PC1pos.PC2neg, na.rm = T)
+quantile(FEA_vM_SHAKE_90$PC1pos.PC2neg, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_90$PC1pos.PC2neg, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_90$PC1pos.PC2neg, 0.90, na.rm = T)
+#### PC1 NEG PC2 POS
+max(FEA_vM_SHAKE_90$PC1neg.PC2pos, na.rm = T)
+quantile(FEA_vM_SHAKE_90$PC1neg.PC2pos, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_90$PC1neg.PC2pos, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_90$PC1neg.PC2pos, 0.90, na.rm = T)
+#### PC1 NEG PC2 NEG
+max(FEA_vM_SHAKE_90$PC1neg.PC2neg, na.rm = T)
+quantile(FEA_vM_SHAKE_90$PC1neg.PC2neg, 0.99, na.rm = T)
+quantile(FEA_vM_SHAKE_90$PC1neg.PC2neg, 0.95, na.rm = T)
+quantile(FEA_vM_SHAKE_90$PC1neg.PC2neg, 0.90, na.rm = T)
+
+```
+
+
+```{r}
+### IMPORTING AND ORGANISING ALL BTA and FEA DATA PART 1 ###
+
+# IMPORT
+ALL <- read_csv("BITE_PULL_SHAKE_all_percentiles.csv")
+ALL
+
+# LOADING CONDITION DEFINITIONS
+# BITE_2_full = BITE 2% von Mises max stress value using full dataset (FEA)
+# BITE_2_99 = BITE 2% von Mises max stress value taking 99th percentile (FEA)
+# BITE_2_95 = BITE 2% von Mises max stress value taking 95th percentile (FEA)
+# BITE_2_90 = BITE 2% von Mises max stress value taking 90th percentile (FEA)
+
+# BITE_70_full = BITE 70 nodes von Mises max stress value using full dataset (FEA)
+# BITE_70_99 = BITE 70 nodes von Mises max stress value taking 99th percentile (FEA)
+# BITE_70_95 = BITE 70 nodes von Mises max stress value taking 95th percentile (FEA)
+# BITE_70_90 = BITE 70 nodes von Mises max stress value taking 90th percentile (FEA)
+
+# BITE_2_60_90 = OFF-ANGLE BITING -30 in anterior-posterior (also called 60 degrees) von Mises max stress value taking the 90th percentile (FEA)
+# BITE_2_120_90 = OFF-ANGLE BITING +30 in anterior-posterior (also called 120 degrees) von Mises max stress value taking the 90th percentile (FEA)
+# BITE_2_60_LL_90 = OFF-ANGLE BITING -30 in lingual-labial (also called 60 degrees) von Mises max stress value taking the 90th percentile (FEA)
+# BITE_2_120_LL_90 = OFF-ANGLE BITING +30 in lingual-labial (also called 120 degrees) von Mises max stress value taking the 90th percentile (FEA)
+
+# BITE_50_full = BITE 50% von Mises max stress value using full dataset (FEA)
+# BITE_50_99 = BITE 50% von Mises max stress value taking 99th percentile (FEA)
+# BITE_50_95 = BITE 50% von Mises max stress value taking 95th percentile (FEA)
+# BITE_50_90 = BITE 50% von Mises max stress value taking 90th percentile (FEA)
+
+# PULL_50_full = PULL 50% von Mises max stress value using full dataset (FEA)
+# PULL_50_99 = PULL 50% von Mises max stress value taking 99th percentile (FEA)
+# PULL_50_95 = PULL 50% von Mises max stress value taking 95th percentile (FEA)
+# PULL_50_90 = PULL 50% von Mises max stress value taking 90th percentile (FEA)
+
+# PULL_90_full = PULL 90% von Mises max stress value using full dataset (FEA)
+# PULL_90_99 = PULL 90% von Mises max stress value taking 99th percentile (FEA)
+# PULL_90_95 = PULL 90% von Mises max stress value taking 95th percentile (FEA)
+# PULL_90_90 = PULL 90% von Mises max stress value taking 90th percentile (FEA)
+
+# SHAKE_50_full = SHAKE 50% von Mises max stress value using full dataset (FEA)
+# SHAKE_50_99 = SHAKE 50% von Mises max stress value taking 99th percentile (FEA)
+# SHAKE_50_95 = SHAKE 50% von Mises max stress value taking 95th percentile (FEA)
+# SHAKE_50_90 = SHAKE 50% von Mises max stress value taking 90th percentile (FEA)
+
+# SHAKE_90_full = SHAKE 90% von Mises max stress value using full dataset (FEA)
+# SHAKE_90_99 = SHAKE 90% von Mises max stress value taking 99th percentile (FEA)
+# SHAKE_90_95 = SHAKE 90% von Mises max stress value taking 95th percentile (FEA)
+# SHAKE_90_90 = SHAKE 90% von Mises max stress value taking 90th percentile (FEA)
+
+# Stressy.300N.PULL.50 = maximum stress valued calculated from a cross-section at 50% of the tooth height under anterior-posterior pulling load (BTA)
+# Stressy.300N.PULL.90 = maximum stress valued calculated from a cross-section at 90% of the tooth height under anterior-posterior pulling load (BTA)
+
+# Stressx.300N.SHAKE.50 = maximum stress valued calculated from a cross-section at 50% of the tooth height under lateral shaking load (BTA)
+# Stressx.300N.SHAKE.90 = maximum stress valued calculated from a cross-section at 90% of the tooth height under lateral shaking load (BTA)
+
+
+# RE-ORGANISING FOR GRAPHING
+ALL.melt <- melt(ALL, measure.var = c("BITE_2_full", "BITE_2_99", "BITE_2_95", "BITE_2_90", "BITE_2_60_90", "BITE_2_60_LL_90", "BITE_2_120_90", "BITE_2_120_LL_90", "PULL_50_full", "PULL_50_99", "PULL_50_95", "PULL_50_90", "SHAKE_50_full", "SHAKE_50_99", "SHAKE_50_95", "SHAKE_50_90", "BITE_50_full", "BITE_50_99", "BITE_50_95", "BITE_50_90", "PULL_90_full", "PULL_90_99", "PULL_90_95", "PULL_90_90", "SHAKE_90_full", "SHAKE_90_99", "SHAKE_90_95", "SHAKE_90_90", "BITE_70_full", "BITE_70_99", "BITE_70_95", "BITE_70_90", "Stressx.300N.SHAKE.50", "Stressx.300N.SHAKE.90", "Stressy.300N.PULL.50","Stressy.300N.PULL.90"), variable.name = "Simulation.percentile")
+names(ALL.melt)[names(ALL.melt) == "value"] <- "vonMises"
+
+SpeciesOrder1 <- c("PC1.max","PC1pos.PC2pos", "PC1pos.PC2neg","Ailuropoda.melanoleuca", "Sarcophilus.harrisii","Ursus.arctos", "Mean.Shape","PC2.max","Eira.barbara","Didelphis.marsupialis", "PC2.min", "Leopardus.paradalis", "Procyon.lotor", "Canis.dingo", "Panthera.uncia","Viverra.zibetha", "Vulpes.vulpes", "PC1.min", "PC1neg.PC2pos", "PC1neg.PC2neg")
+
+ALL.melt$Species <- factor(ALL.melt$Species, levels = SpeciesOrder1)
+
+```
+
+
+```{r}
+### LINE GRAPHS OF ALL MAX STRESS VALUES ###
+
+# WHAT DOES THE DATA LOOK LIKE? 
+# ALL VALUES BTA and FEA
+ggplot(ALL.melt,
+     aes(x = Species, y = vonMises, group = Simulation.percentile)) +
+     geom_line(aes(colour = ALL.melt$Simulation.percentile)) +
+     coord_cartesian(ylim = c(0,250)) +
+     theme_classic() +
+     theme(axis.text.x = element_text(angle=65, vjust=0.6))
+
+# HOW DO BITE 2% and BITE 70 nodes compare?
+ggplot(data = ALL.melt[ALL.melt$Simulation.percentile %in% c('BITE_70_90', 'BITE_2_90'),],
+     aes(x = Species, y = vonMises, group = Simulation.percentile)) +
+     geom_line(aes(colour = Simulation.percentile)) +
+     coord_cartesian(ylim = c(0,100)) +
+     theme_classic() +
+     theme(axis.text.x = element_text(angle=65, vjust=0.6))
+
+# HOW DO THE DIFFERENCE MAX STRESS PERCENTILES COMPARE?
+
+# BITE 2%
+ggplot(data = ALL.melt[ALL.melt$Simulation.percentile %in% c('BITE_2_full', 'BITE_2_99', 'BITE_2_95', 'BITE_2_90'),],
+     aes(x = Species, y = vonMises, group = Simulation.percentile)) +
+     geom_line(aes(colour = Simulation.percentile)) +
+     coord_cartesian(ylim = c(0,450)) +
+     theme_classic() +
+     theme(axis.text.x = element_text(angle=65, vjust=0.6))
+
+# BITE 50%
+ggplot(data = ALL.melt[ALL.melt$Simulation.percentile %in% c('BITE_50_full', 'BITE_50_99', 'BITE_50_95', 'BITE_50_90'),],
+     aes(x = Species, y = vonMises, group = Simulation.percentile)) +
+     geom_line(aes(colour = Simulation.percentile)) +
+     coord_cartesian(ylim = c(0,450)) +
+     theme_classic() +
+     theme(axis.text.x = element_text(angle=65, vjust=0.6)) 
+
+# PULL 50
+ggplot(data = ALL.melt[ALL.melt$Simulation.percentile %in% c('PULL_50_full', 'PULL_50_99', 'PULL_50_95', 'PULL_50_90'),],
+     aes(x = Species, y = vonMises, group = Simulation.percentile)) +
+     geom_line(aes(colour = Simulation.percentile)) +
+     coord_cartesian(ylim = c(0,750)) +
+     theme_classic() +
+     theme(axis.text.x = element_text(angle=65, vjust=0.6)) 
+
+# PULL 90%
+ggplot(data = ALL.melt[ALL.melt$Simulation.percentile %in% c('PULL_90_full', 'PULL_90_99', 'PULL_90_95', 'PULL_90_90'),],
+     aes(x = Species, y = vonMises, group = Simulation.percentile)) +
+     geom_line(aes(colour = Simulation.percentile)) +
+     coord_cartesian(ylim = c(0,400)) +
+     theme_classic() +
+     theme(axis.text.x = element_text(angle=65, vjust=0.6)) 
+
+# SHAKE 50%
+ggplot(data = ALL.melt[ALL.melt$Simulation.percentile %in% c('SHAKE_50_full', 'SHAKE_50_99', 'SHAKE_50_95', 'SHAKE_50_90'),],
+     aes(x = Species, y = vonMises, group = Simulation.percentile)) +
+     geom_line(aes(colour = Simulation.percentile)) +
+     coord_cartesian(ylim = c(0,550)) +
+     theme_classic() +
+     theme(axis.text.x = element_text(angle=65, vjust=0.6)) 
+
+# SHAKE 90%
+ggplot(data = ALL.melt[ALL.melt$Simulation.percentile %in% c('SHAKE_90_full', 'SHAKE_90_99', 'SHAKE_90_95', 'SHAKE_90_90'),],
+     aes(x = Species, y = vonMises, group = Simulation.percentile)) +
+     geom_line(aes(colour = Simulation.percentile)) +
+     coord_cartesian(ylim = c(0,350)) +
+     theme_classic() +
+     theme(axis.text.x = element_text(angle=65, vjust=0.6)) 
+
+```
+
+```{r}
+### IMPORTING AND ORGANISING ALL BTA and FEA DATA PART 2 ###
+
+# IMPORT
+BT_FEA_STRESSES <- read_csv("Max.stress.vs.vonMises.csv")
+BT_FEA_STRESSES
+
+# RELATIVE CONTRIBUTION OF LATERAL COMPRESSION AND ROBUSTICITY TO PC1 SCORE
+# ARE LATERAL COMPRESSION AND ROBUSTICITY METRIC CORRELATED WITH PC1?
+
+# LOADING CONDITION AND SHAPE MEASURES DEFINITIONS
+# Angled.Ratio.90 = Measure of lateral compression of a tooth at 90% of the tooth height
+# Angled.Ratio.50 = Measure of lateral compression of a tooth at 50% of the tooth height
+# Robust.metric.90 = Measure of robusticity of a tooth at 90% of the tooth height
+# Robust.metric.50 = Measure of robusticity of a tooth at 50% of the tooth height
+# PC1.score = Measure of robusticity
+
+# ROBUST METRIC VS PC1
+lmRobust.metric.50.vs.PC1 <- lm(PC1.score ~ Robust.metric.50, data = BT_FEA_STRESSES)
+summary(lmRobust.metric.50.vs.PC1)
+
+lmRobust.metric.90.vs.PC1 <- lm(PC1.score ~ Robust.metric.90, data = BT_FEA_STRESSES)
+summary(lmRobust.metric.90.vs.PC1)
+
+# LATERAL COMPRESSION METRIC VS PC1
+lmLC.50.vs.PC1 <- lm(PC1.score ~ Angled.Ratio.50, data = BT_FEA_STRESSES)
+summary(lmLC.50.vs.PC1)
+
+lmLC.90.vs.PC1 <- lm(PC1.score ~ Angled.Ratio.90, data = BT_FEA_STRESSES)
+summary(lmLC.90.vs.PC1)
+
+```
+
+
+```{r}
+### LINEAR REGRESSIONS BETWEEN ASPECTS OF TOOTH SHAPE (LATERAL COMPRESSION, ROBUSTICITY, CURVATURE) and MAX STRESS VALUES (BTA, FEA) ###
+
+# LOADING CONDITION AND SHAPE MEASURES DEFINITIONS
+# Angled.Ratio.90 = Measure of lateral compression of a tooth at 90% of the tooth height
+# Angled.Ratio.50 = Measure of lateral compression of a tooth at 50% of the tooth height
+# PC1.score = Measure of robusticity
+# PC2.score = Measure of curvature
+
+# Stressx.300N.SHAKE.90 = maximum stress valued calculated from a cross-section at 90% of the tooth height under lateral shaking load (BTA)
+# Stressx.300N.SHAKE.50 = maximum stress valued calculated from a cross-section at 50% of the tooth height under lateral shaking load (BTA)
+# Stressx.300N.PULL.90 = maximum stress valued calculated from a cross-section at 90% of the tooth height under anterior-posterior pulling load (BTA)
+# Stressx.300N.PULL.50 = maximum stress valued calculated from a cross-section at 50% of the tooth height under anterior-posterior pulling load (BTA)
+
+# BITE_2 = BITE 2% von Mises max stress value taking the 90th percentile (FEA)
+# BITE_2_60 = OFF-ANGLE BITING -30 in anterior-posterior (also called 60 degrees) von Mises max stress value taking the 90th percentile (FEA)
+# BITE_2_120 = OFF-ANGLE BITING +30 in anterior-posterior (also called 120 degrees) von Mises max stress value taking the 90th percentile (FEA)
+# BITE_2_LL_60 = OFF-ANGLE BITING -30 in lingual-labial (also called 60 degrees) von Mises max stress value taking the 90th percentile (FEA)
+# BITE_2_LL_120 = OFF-ANGLE BITING +30 in lingual-labial (also called 120 degrees) von Mises max stress value taking the 90th percentile (FEA)
+# BITE_50 = BITE 50% von Mises max stress value taking the 90th percentile (FEA)
+# PULL_50 = PULL 50% von Mises max stress value taking the 90th percentile (FEA)
+# PULL_90 = PULL 90% von Mises max stress value taking the 90th percentile (FEA)
+# SHAKE_50 = SHAKE 50% von Mises max stress value taking the 90th percentile (FEA)
+# SHAKE_90 = SHAKE 90% von Mises max stress value taking the 90th percentile (FEA)
+
+
+### BEAM THEORY ###
+
+# LATERAL COMPRESSION AND BTA MAX STRESS
+BT.SHAKE.90.vs.Ratio90 <- lm(Stressx.300N.SHAKE.90 ~ Angled.Ratio.90, data = BT_FEA_STRESSES)
+summary(BT.SHAKE.90.vs.Ratio90)
+
+BT.SHAKE.90.vs.Ratio50 <- lm(Stressx.300N.SHAKE.90 ~ Angled.Ratio.50, data = BT_FEA_STRESSES)
+summary(BT.SHAKE.90.vs.Ratio50)
+
+BT.SHAKE.50.vs.Ratio90 <- lm(Stressx.300N.SHAKE.50 ~ Angled.Ratio.90, data = BT_FEA_STRESSES)
+summary(BT.SHAKE.50.vs.Ratio90)
+
+BT.SHAKE.50.vs.Ratio50 <- lm(Stressx.300N.SHAKE.50 ~ Angled.Ratio.50, data = BT_FEA_STRESSES)
+summary(BT.SHAKE.50.vs.Ratio50)
+
+BT.PULL.90.vs.Ratio90 <- lm(Stressy.300N.PULL.90 ~ Angled.Ratio.90, data = BT_FEA_STRESSES)
+summary(BT.PULL.90.vs.Ratio90)
+
+BT.PULL.90.vs.Ratio50 <- lm(Stressy.300N.PULL.90 ~ Angled.Ratio.50, data = BT_FEA_STRESSES)
+summary(BT.PULL.90.vs.Ratio50)
+
+BT.PULL.50.vs.Ratio90 <- lm(Stressy.300N.PULL.50 ~ Angled.Ratio.90, data = BT_FEA_STRESSES)
+summary(BT.PULL.50.vs.Ratio90)
+
+BT.PULL.50.vs.Ratio50 <- lm(Stressy.300N.PULL.50 ~ Angled.Ratio.50, data = BT_FEA_STRESSES)
+summary(BT.PULL.50.vs.Ratio50)
+
+
+# ROBUSTICITY AND BTA MAX STRESS
+SHAKE90.BT.vs.PC1 <- lm(Stressx.300N.SHAKE.90 ~ PC1.score, data = BT_FEA_STRESSES)
+summary(SHAKE90.BT.vs.PC1)
+
+SHAKE50.BT.vs.PC1 <- lm(Stressx.300N.SHAKE.50 ~ PC1.score, data = BT_FEA_STRESSES)
+summary(SHAKE50.BT.vs.PC1)
+
+PULL90.BT.vs.PC1 <- lm(Stressy.300N.PULL.90 ~ PC1.score, data = BT_FEA_STRESSES)
+summary(PULL90.BT.vs.PC1)
+
+PULL50.BT.vs.PC1 <- lm(Stressy.300N.PULL.50 ~ PC1.score, data = BT_FEA_STRESSES)
+summary(PULL50.BT.vs.PC1)
+
+
+# CURVATURE AND BTA MAX STRESS
+SHAKE90.BT.vs.PC2 <- lm(Stressx.300N.SHAKE.90 ~ PC2.score, data = BT_FEA_STRESSES)
+summary(SHAKE90.BT.vs.PC2)
+
+SHAKE50.BT.vs.PC2 <- lm(Stressx.300N.SHAKE.50 ~ PC2.score, data = BT_FEA_STRESSES)
+summary(SHAKE50.BT.vs.PC2)
+
+PULL90.BT.vs.PC2 <- lm(Stressy.300N.PULL.90 ~ PC2.score, data = BT_FEA_STRESSES)
+summary(PULL90.BT.vs.PC2)
+
+PULL50.BT.vs.PC2 <- lm(Stressy.300N.PULL.50 ~ PC2.score, data = BT_FEA_STRESSES)
+summary(PULL50.BT.vs.PC2)
+
+
+### FINITE ELEMENT ANALYSIS ###
+
+# LATERAL COMPRESSION AND FEA MAX STRESS
+LC.50.vs.BITE2 <- lm(BITE_2 ~ Angled.Ratio.50, data = BT_FEA_STRESSES)
+summary(LC.50.vs.BITE2)
+
+LC.90.vs.BITE2 <- lm(BITE_2 ~ Angled.Ratio.90, data = BT_FEA_STRESSES)
+summary(LC.90.vs.BITE2)
+
+LC.50.vs.BITE2_AP_120 <- lm(BITE_2_120 ~ Angled.Ratio.50, data = BT_FEA_STRESSES)
+summary(LC.50.vs.BITE2_AP_120)
+
+LC.50.vs.BITE2_AP_60 <- lm(BITE_2_60 ~ Angled.Ratio.50, data = BT_FEA_STRESSES)
+summary(LC.50.vs.BITE2_AP_60)
+
+LC.50.vs.BITE50 <- lm(BITE_50 ~ Angled.Ratio.90, data = BT_FEA_STRESSES)
+summary(LC.50.vs.BITE50)
+
+LC.90.vs.BITE50 <- lm(BITE_50 ~ Angled.Ratio.90, data = BT_FEA_STRESSES)
+summary(LC.90.vs.BITE50)
+
+LC.50.vs.PULL50 <- lm(PULL_50 ~ Angled.Ratio.50, data = BT_FEA_STRESSES)
+summary(LC.50.vs.PULL50)
+
+LC.90.vs.PULL50 <- lm(PULL_50 ~ Angled.Ratio.90, data = BT_FEA_STRESSES)
+summary(LC.90.vs.PULL50)
+
+LC.50.vs.SHAKE50 <- lm(SHAKE_50 ~ Angled.Ratio.50, data = BT_FEA_STRESSES)
+summary(LC.50.vs.SHAKE50)
+
+LC.90.vs.SHAKE90 <- lm(SHAKE_90 ~ Angled.Ratio.90, data = BT_FEA_STRESSES)
+summary(LC.90.vs.SHAKE90)
+
+# ROBUSTICITY AND FEA MAX STRESS
+PC1.vs.BITE2 <- lm(BITE_2 ~ PC1.score, data = BT_FEA_STRESSES)
+summary(PC1.vs.BITE2)
+
+PC1.vs.BITE2_AP_120 <- lm(BITE_2_120 ~ PC1.score, data = BT_FEA_STRESSES)
+summary(PC1.vs.BITE2_AP_120)
+
+PC1.vs.BITE2_AP_60 <- lm(BITE_2_60 ~ PC1.score, data = BT_FEA_STRESSES)
+summary(PC1.vs.BITE2_AP_60)
+
+PC1.vs.BITE2_LL_120 <- lm(BITE_2_120_LL_90 ~ PC1.score, data = BT_FEA_STRESSES)
+summary(PC1.vs.BITE2_LL_120)
+
+PC1.vs.BITE2_LL_60 <- lm(BITE_2_60_LL_90 ~ PC1.score, data = BT_FEA_STRESSES)
+summary(PC1.vs.BITE2_LL_60)
+
+PC1.vs.BITE50 <- lm(BITE_50 ~ PC1.score, data = BT_FEA_STRESSES)
+summary(PC1.vs.BITE50)
+
+PC1.vs.PULL50 <- lm(PULL_50 ~ PC1.score, data = BT_FEA_STRESSES)
+summary(PC1.vs.PULL50)
+
+PC1.vs.PULL90 <- lm(PULL_90 ~ PC1.score, data = BT_FEA_STRESSES)
+summary(PC1.vs.PULL90)
+
+PC1.vs.SHAKE50 <- lm(SHAKE_50 ~ PC1.score, data = BT_FEA_STRESSES)
+summary(PC1.vs.SHAKE50)
+
+PC1.vs.SHAKE90 <- lm(SHAKE_90 ~ PC1.score, data = BT_FEA_STRESSES)
+summary(PC1.vs.SHAKE90)
+
+# CURVATURE AND FEA MAX STRESS
+PC2.vs.BITE2 <- lm(BITE_2 ~ PC2.score, data = BT_FEA_STRESSES)
+summary(PC2.vs.BITE2)
+
+PC2.vs.BITE2_AP_120 <- lm(BITE_2_120 ~ PC2.score, data = BT_FEA_STRESSES)
+summary(PC2.vs.BITE2_AP_120)
+
+PC2.vs.BITE2_AP_60 <- lm(BITE_2_60 ~ PC2.score, data = BT_FEA_STRESSES)
+summary(PC2.vs.BITE2_AP_60)
+
+PC2.vs.BITE2_LL_120 <- lm(BITE_2_120_LL_90 ~ PC2.score, data = BT_FEA_STRESSES)
+summary(PC2.vs.BITE2_LL_120)
+
+PC2.vs.BITE2_LL_60 <- lm(BITE_2_60_LL_90 ~ PC2.score, data = BT_FEA_STRESSES)
+summary(PC2.vs.BITE2_LL_60)
+
+PC2.vs.BITE50 <- lm(BITE_50 ~ PC2.score, data = BT_FEA_STRESSES)
+summary(PC2.vs.BITE50)
+
+PC2.vs.PULL50 <- lm(PULL_50 ~ PC2.score, data = BT_FEA_STRESSES)
+summary(PC2.vs.PULL50)
+
+PC2.vs.PULL90 <- lm(PULL_90 ~ PC2.score, data = BT_FEA_STRESSES)
+summary(PC2.vs.PULL90)
+
+PC2.vs.SHAKE50 <- lm(SHAKE_50 ~ PC2.score, data = BT_FEA_STRESSES)
+summary(PC2.vs.SHAKE50)
+
+PC2.vs.SHAKE90 <- lm(SHAKE_90 ~ PC2.score, data = BT_FEA_STRESSES)
+summary(PC2.vs.SHAKE90)
+
+
+```
+
+
+```{r}
+### HOW DO BTA AND FEA MAX STRESS VALUES COMPARE? ###
+
+# LINEAR REGRESSIONS OF BEAM THEORY STRESS VS FEA VON MISES STRESS
+
+# SHAKING
+SHAKE90.BT.vs.SHAKE90 <- lm(Stressx.300N.SHAKE.90 ~ SHAKE_90, data = BT_FEA_STRESSES)
+summary(SHAKE90.BT.vs.SHAKE90)
+
+SHAKE50.BT.vs.SHAKE50 <- lm(Stressx.300N.SHAKE.50 ~ SHAKE_50, data = BT_FEA_STRESSES)
+summary(SHAKE50.BT.vs.SHAKE50)
+
+# PULLING
+PULL90.BT.vs.PULL90 <- lm(Stressy.300N.PULL.90 ~ PULL_90, data = BT_FEA_STRESSES)
+summary(PULL90.BT.vs.PULL90)
+
+PULL50.BT.vs.PULL50 <- lm(Stressy.300N.PULL.50 ~ PULL_50, data = BT_FEA_STRESSES)
+summary(PULL50.BT.vs.PULL50)
+
+```
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
